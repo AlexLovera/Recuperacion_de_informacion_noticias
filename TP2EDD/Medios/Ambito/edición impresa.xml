@@ -1,0 +1,29 @@
+<rss xmlns:ns0="http://purl.org/rss/1.0/modules/syndication/" xmlns:ns1="http://www.w3.org/2005/Atom" version="2.0">
+	<channel>
+		<title>Ambito - Edición Impresa</title>
+		<description>Ambito</description>
+		<link>https://www.ambito.com</link>
+		<language>spa</language>
+		<lastBuildDate>2019-10-11T22:21:29-03:00</lastBuildDate>
+		<ns0:updatePeriod>hourly</ns0:updatePeriod>
+		<ns0:updateFrequency>1</ns0:updateFrequency>
+		<generator>http://www.dosalcubo.com.ar</generator>
+		<copyright>Copyright (c) 2019</copyright>
+		<ns1:link href="https://www.ambito.com/rss/edicion-impresa.xml" rel="self" type="application/rss+xml" />		<image>
+			<title>Ambito - Edición Impresa</title>
+			<url>https://www.ambito.com/css/images/t1.gif</url>
+			<link>https://www.ambito.com</link>
+		</image>
+		<item>
+			<title>
+La UOM lanzó huelga nacional para el 6/12 por su paritaria
+</title>
+			<link>https://www.ambito.com/la-uom-lanzo-huelga-nacional-el-612-su-paritaria-n5001792</link>
+			<guid>https://www.ambito.com/la-uom-lanzo-huelga-nacional-el-612-su-paritaria-n5001792</guid>
+			<description>
+
+</description>
+			<pubDate>2018-11-27T00:46:00-03:00</pubDate>
+		</item>
+
+	</channel></rss>
