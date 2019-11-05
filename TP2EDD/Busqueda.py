@@ -5,7 +5,7 @@ import json
 import shelve
 from nltk.stem import SnowballStemmer #Stemmer
 from Crear_indice_post_list import UncompressedPostings,acondicionar_palabra
-from Indice_invertido_y_compresion import crear_indice_invertido
+from Indice_invertido_y_compresion import crear_indice_invertido,Variable_byte_decode_list
 
 
 codificador=UncompressedPostings()
@@ -49,7 +49,7 @@ def busqueda_booleana(palabras,ruta):#REALIZAR PROCESAMIENTO LINGUISTICO SOBRE T
                 if termID+1 in indice_invertido:
                     posicion_final=indice_invertido[termID+1][0]
                 archivo.read(posicion_inicial)#paso por encima todos las posting list que no sean necesarias
-                posting_list=codificador.decode(archivo.read(posicion_final-posicion_inicial))#leo toda la posting list del termID
+                posting_list=Variable_byte_decode_list(archivo.read(posicion_final-posicion_inicial))#leo toda la posting list del termID
                 print(f"La palabra '{palabra}'', fue encontrada en:")
                 print(posting_list)
                 for docIDi in posting_list:
