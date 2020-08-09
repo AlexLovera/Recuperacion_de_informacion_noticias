@@ -1,0 +1,14 @@
+<rss xmlns:ns0="http://www.w3.org/2005/Atom" xmlns:ns1="http://purl.org/rss/1.0/modules/syndication/" version="2.0">
+
+    <channel>
+        <title>El MostradorEl Mostrador</title>
+        <ns0:link href="https://www.elmostrador.cl/noticias/negocios/feed/" rel="self" type="application/rss+xml" />
+        <link>https://www.elmostrador.cl</link>
+        <description>https://www.elmostrador.cl</description>
+        <lastBuildDate>Tue, 22 Oct 2019 01:05:24 +0000</lastBuildDate>
+        <language>es-ES</language>
+        <ns1:updatePeriod>hourly</ns1:updatePeriod>
+        <ns1:updateFrequency>1</ns1:updateFrequency>
+        <generator>https://wordpress.org/?v=4.9.8</generator>
+    </channel>
+</rss>
