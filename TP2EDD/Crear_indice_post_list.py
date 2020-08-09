@@ -1,4 +1,3 @@
-import json
 import shelve
 import array
 import os
@@ -7,7 +6,6 @@ from nltk.corpus import stopwords #Stopwords
 from nltk.stem.wordnet import WordNetLemmatizer #Lematizador
 import math
 import pickle
-import sys
 import queue#usar Queue o SimpleQueue
 import xml.etree.ElementTree as xml
 import string
@@ -32,7 +30,7 @@ class UncompressedPostings:
         decoded_postings_list.frombytes(encoded_postings_list)
         return decoded_postings_list.tolist()
 
-def acondicionar_palabra(palabra):
+def sacar_tildes_y_puntuacion(palabra):
     reemplazos = (("á", "a"), ("é", "e"), ("ó", "o"), ("ú", "u"))
     palabra = palabra.lower()
     palabra = palabra.strip()
@@ -50,17 +48,17 @@ def _merge_indices_intermedios(cant_bloques,lista_merge_de_indices=None,lista_in
     # return _merge_indices(lista_indices[0],lista_indices[1])
     while cant_bloques>1:
         for bloque in range(0,cant_bloques,2):
-            # print("n°bloque: ",bloque,bloque+1)
             try:
                 indice_fusionado=_merge_indices(lista_indices[bloque],lista_indices[bloque+1])
-            except Exception:
+            except Exception as e:
+                import time
+                print(lista_indices)
+                print(e)
+                time.sleep(10)
                 print("n°bloque: ", bloque, bloque + 1)
                 print("longitud de lista: ",len(lista_indices))
-            # print("indice_fusionado: ",indice_fusionado)
             lista_merge_de_indices.append(indice_fusionado)
         cant_bloques=math.ceil(cant_bloques/2)#redondea para arriba
-        # if cant_bloques is 1:
-        #     lista_merge_de_indices.append(lista_indices[-1])
         return _merge_indices_intermedios(cant_bloques,lista_indices=lista_merge_de_indices)
 
 def _merge_indices(indices_invertidos_intermedios,indices_invertidos_intermedios2):
@@ -109,33 +107,29 @@ def BSBI_algorithm(ruta):#ruta=Medios
         numero_de_bloque+=1
         dic_por_termID_postL = dict()#este sera el nuevo indice para el bloque
         for arch_xml in os.listdir(ruta+"/"+medio):
-            #termino:postinList
-            docID += 1
-            #print(arch_xml,docID)
-            # dic_documentos_ID[medio+">"+arch_xml]=docID#guardar en DISCO
-            dic_documentos_ID[docID]=medio+"/"+arch_xml
-            tree=xml.parse(ruta+"/"+medio+"/"+arch_xml)
-            root=tree.getroot()
-            for item in root.findall('.//item'):
-                titulo=item.find('title')
-                if not titulo is None:
-                    titulo = titulo.text
-                    # titulos_juntos+=" "+titulo#para que no se junten la primera y ultima palabra de los titulos
-        #Hasta aca tengo que tener todos los titulos en un string
-        #Primero le saco las tildes, puntuacion, verifico que no este en las stop_words y luego stemming, lemat...
-                    lista_palabras = [acondicionar_palabra(palabra) for palabra in titulo.split() if not palabra in stop_words]#para ordenar
-                    lista_palabras=[spanish_stemmer.stem(lematizador.lemmatize(w)) for w in lista_palabras]
-                    # lista_palabras.sort()#titulo ordenado alfabeticamente
-                    for palabra in lista_palabras:#creo dic_term_posting
-                        dic_term_posting.setdefault(palabra, set())
-                        dic_term_posting[palabra].add(docID)
+            try:
+                tree=xml.parse(ruta+"/"+medio+"/"+arch_xml)
+                dic_documentos_ID[docID+1] = medio + "/" + arch_xml
+                docID += 1
+                root=tree.getroot()
+                for item in root.findall('.//item'):
+                    titulo=item.find('title')
+                    if not titulo is None:
+                        titulo = titulo.text
+                        lista_palabras = [sacar_tildes_y_puntuacion(palabra) for palabra in titulo.split() if not palabra in stop_words]#para ordenar
+                        # lista_palabras=[spanish_stemmer.stem(lematizador.lemmatize(w)) for w in lista_palabras]
+                        lista_palabras=[spanish_stemmer.stem(w) for w in lista_palabras]
+                        for palabra in lista_palabras:#creo dic_term_posting
+                            dic_term_posting.setdefault(palabra, set())
+                            dic_term_posting[palabra].add(docID)
+            except xml.ParseError:
+                print(f"Error al parsear: {medio}/{arch_xml}")
         palabras_ordenadas=list(dic_term_posting.keys())
         palabras_ordenadas.sort()
         for palabra in palabras_ordenadas:
             if palabra not in dic_termino_termID:  # hago esto porque solo tiene que agregar el termID una vez
                 termID += 1
                 dic_termino_termID[palabra]=termID#palabra: termID
-                #En caso de que este...
             termID_actual=dic_termino_termID[palabra]
             dic_por_termID_postL.setdefault(termID_actual,codificador.encode(dic_term_posting[palabra]))
         _guardar_indices_intermedios_o_dic(f"Indices_intermedios/indice_intermedio_{numero_de_bloque}",dic_por_termID_postL,numero_de_bloque)
@@ -148,62 +142,11 @@ def BSBI_algorithm(ruta):#ruta=Medios
         with shelve.open(f"Indices_intermedios/indice_intermedio_{numB}", "rb") as archivo:
             for bloque in archivo:
                 lista_indices.append(archivo[bloque])
-    # print(lista_indices)
-    # print(numero_de_bloque)
     posting_list=_merge_indices_intermedios(numero_de_bloque, lista_indices=lista_indices)
-    print(posting_list[0])
     with open("posting_list","wb") as archivo:
         pickle.dump(posting_list[0],archivo)
     del lista_indices
     return posting_list[0]
-
-# def generar_saltos_docID(post_list_prueba,ruta_creacion_posting_list=None,ruta_posting_list=None):
-#     # if ruta_creacion_posting_list is None and ruta_posting_list is None:
-#     #     #raise #se tiene que agregar alguna ruta...
-#     #     pass
-#     post_list_comprimida=dict()
-#     if ruta_posting_list is None:#creo la posting_list
-#         # posting_list_sin_comprimir = BSBI_algorithm(ruta_creacion_posting_list)
-#         posting_list_sin_comprimir=post_list_prueba
-#         #de aca para abajo se podria sacar del if? total se tiene que hacer en los dos casos en los que se resuelva
-#         for termIDi in posting_list_sin_comprimir:
-#             post_list_comprimida.setdefault(termIDi,list())
-#             term_post_list=posting_list_sin_comprimir[termIDi]# le pido la postin list propia del termino
-#             for docIDi in range(len(posting_list_sin_comprimir[termIDi])):
-#                 if docIDi == 0:
-#                     post_list_comprimida[termIDi].append(posting_list_sin_comprimir[termIDi][docIDi])
-#                 else:
-#                     #aca le resto el valor previo en la lista de apariciones...
-#                     post_list_comprimida[termIDi].append(posting_list_sin_comprimir[termIDi][docIDi]-posting_list_sin_comprimir[termIDi][docIDi-1])
-#     else:
-#         #recuperar posting list de disco, pasar keys a int? y ahi trabajarlo
-#         pass
-#     return post_list_comprimida
-#
-#
-# def crear_indice(ruta,posting_list_comprimida):#ruta y boolean
-#     indice_final = dict()
-#     if posting_list_comprimida:#supongo que lo tengo que escribir, lista comprimida?
-#         posting_list = BSBI_algorithm(ruta)
-#         with open("posting_list_comprimida","wb") as archivo:
-#             for termIDi in posting_list:
-#                 lista_docs=posting_list[termIDi]
-#                 indice_final[termIDi]=(archivo.tell(),len(codificador.decode(lista_docs)),sys.getsizeof(lista_docs))
-#                 archivo.write(lista_docs)
-#         print("indice_final_posting_comprimida: ",indice_final)
-#     else:
-#         posting_list = BSBI_algorithm(ruta)
-#         for termIDi in posting_list:
-#             lista_decodificada = codificador.decode(posting_list[termIDi])
-#             indice_final[termIDi] = (termIDi, len(lista_decodificada), sys.getsizeof(lista_decodificada))
-#         print(indice_final)
-#     with open("indice_invertido_pos","w") as archivo:
-#         json.dump(indice_final,archivo)
-#     return indice_final
-
-# x=BSBI_algorithm("Medios_prueba")
-#ser/macri/messi/hoy/que/ley/militar/ten?
-#VER sanchez, que no imprime titulos, pero si posting list
 
 #Funciona lo de abajo, prueba... agregando una posting list vacia y comentando el primer if y bsbi
 # post_list_prueba={1:[7,25,43,104,105],2:[8,16,30,100,106]}
