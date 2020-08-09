@@ -2,7 +2,7 @@ import time;import configparser
 from colorama import init,Style;init()
 import os
 from datetime import datetime
-from Excepciones_TP2 import *
+from Excepciones import *
 color_error="\033[4;31m"+ Style.BRIGHT
 color_blanco='\033[0;37m'
 def ejecutar_recolector(config):

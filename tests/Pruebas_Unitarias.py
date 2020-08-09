@@ -1,12 +1,12 @@
 import unittest
-from App import *
-from Recolector_de_noticias import *
-from Crear_indice_post_list import *
-from Busqueda import *
-from  TP2EDD_Final.Indice_invertido_y_compresion import *
+from src.App import *
+from src.Recolector_de_noticias import *
+from src.Crear_indice_post_list import *
+from src.Busqueda import *
+from  src.Indice_invertido_y_compresion import *
 import shelve
 
-from TP2EDD_Final.Crear_indice_post_list import _merge_indices,UncompressedPostings,sacar_tildes_y_puntuacion
+from src.Crear_indice_post_list import _merge_indices,UncompressedPostings,sacar_tildes_y_puntuacion
 
 
 class Test_Recolector_de_Noticias(unittest.TestCase):
@@ -15,7 +15,7 @@ class Test_Recolector_de_Noticias(unittest.TestCase):
     #     with self.assertRaises(KeyError):
     #         #Ingreso direccion invalida
     def test_probar_merge_de_dos_indices_intermedios_desde_disco(self):
-        with shelve.open("Indices_intermedios/indice_intermedio_2", "r") as archivo1,shelve.open("Indices_intermedios/indice_intermedio_3", "r") as archivo2:
+        with shelve.open("../Indices_intermedios/indice_intermedio_2", "r") as archivo1,shelve.open("../Indices_intermedios/indice_intermedio_3", "r") as archivo2:
             indice1=archivo1["indice_n°2"]
             indice2=archivo2["indice_n°3"]
             print("1°Indice a mergear",indice1)
