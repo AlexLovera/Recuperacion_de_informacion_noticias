@@ -6,8 +6,8 @@ import shelve
 from nltk.stem import SnowballStemmer #Stemmer
 from colorama import init,Style;init()
 from nltk.stem.wordnet import WordNetLemmatizer #Lematizador
-from Crear_indice_post_list import UncompressedPostings,sacar_tildes_y_puntuacion
-from Indice_invertido_y_compresion import crear_indice_invertido,Variable_byte_decode_list,revertir_saltos_docID
+from src.Crear_indice_post_list import UncompressedPostings,sacar_tildes_y_puntuacion
+from src.Indice_invertido_y_compresion import crear_indice_invertido,Variable_byte_decode_list,revertir_saltos_docID
 
 color_error="\033[4;31m"+ Style.BRIGHT
 codificador=UncompressedPostings()

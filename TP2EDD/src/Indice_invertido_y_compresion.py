@@ -1,6 +1,6 @@
 import json
 import sys
-from Crear_indice_post_list import UncompressedPostings,BSBI_algorithm
+from src.Crear_indice_post_list import UncompressedPostings,BSBI_algorithm
 codificador=UncompressedPostings()
 from struct import pack, unpack
 

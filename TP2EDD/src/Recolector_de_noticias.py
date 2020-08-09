@@ -3,7 +3,7 @@ import configparser
 import os.path
 from colorama import init,Style;init()
 import requests
-from Excepciones_TP2 import Tipo_de_archivo_incorrecto_exception,Directorio_no_encontrado
+from Excepciones.Excepciones import Tipo_de_archivo_incorrecto_exception,Directorio_no_encontrado
 color_error="\033[4;31m"+ Style.BRIGHT
 color_blanco='\033[0;37m'
 def _compara_xmls_y_añade_articulos_nuevos(url,xmlfile):
